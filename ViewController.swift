@@ -328,7 +328,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         var devofdeviationfrommean = Double(0)
         for i in 0...intervals.count - 1{mean += intervals[i]}
         mean = mean/Double(intervals.count)
-        for i in 0...intervals.count - 1{deviationfrommean.append(abs(intervals[i] - mean)/(intervals[i] + mean))}
+        for i in 0...intervals.count - 1{deviationfrommean.append(abs(intervals[i] - mean)/((intervals[i] + mean)/2))}
         //calculatingaritmia
         for i in 0...deviationfrommean.count - 3{devofdeviationfrommean += deviationfrommean[i]*2 - (deviationfrommean[i + 1] - deviationfrommean[i + 2])}
         stringtoshow = String(String(100*abs(devofdeviationfrommean/Double(deviationfrommean.count - 2))).prefix(7))
