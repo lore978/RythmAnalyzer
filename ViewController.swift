@@ -322,7 +322,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
 
     func analyze() {
         while intervals.count > 12 {intervals.removeFirst()}
-        //print(intervals)
         var mean = Double(0)
         var deviationfrommean = [Double]()
         var devofdeviationfrommean = Double(0)
