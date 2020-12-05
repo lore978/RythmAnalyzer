@@ -146,70 +146,11 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     func alertnopermissiontocamera() {
         let code = getLanguageISO()
         switch code {
-        case "ar":
-            showAlerttoclose(texttoshow: "سيقومسيقوم التطبيق بالتسجيل على بيانات جهازك المستخرجة من الصور للمقارنة والعثور على أكثرها تشابهًا. لن يتم مشاركة البيانات بأي شكل من الأشكال. قبوللا يمكن للتطبيق تحليل البيئة إذا لم تمنح الإذن للوصول إلى الكاميرا.",acceptstring: "")
-        case "fi":
-            showAlerttoclose(texttoshow: "Sovellus ei voi analysoida ympäristöä, jos et anna lupaa käyttää kameraa.",acceptstring: "")
-        case "fr":
-            showAlerttoclose(texttoshow: "L'application ne peut pas analyser l'environnement si vous ne donnez pas la permission d'accéder à la caméra.",acceptstring: "")
-        case "ja":
-            showAlerttoclose(texttoshow: "カメラへのアクセスを許可しないと、アプリは環境を分析できません。",acceptstring: "")
         case "it":
-            showAlerttoclose(texttoshow: "L'app non può analizzare l'ambiente se non si autorizza l'accesso alla fotocamera.",acceptstring: "")
-        case "pt":
-            showAlerttoclose(texttoshow: "O aplicativo não pode analisar o ambiente se você não der permissão para acessar a câmera.",acceptstring: "")
-        case "es":
-            showAlerttoclose(texttoshow: "La aplicación no puede analizar el entorno si no da permiso para acceder a la cámara.",acceptstring: "")
-        case "sv":
-            showAlerttoclose(texttoshow: "Appen kan inte analysera miljön om du inte ger behörighet att komma åt kameran.",acceptstring: "")
-        case "de":
-            showAlerttoclose(texttoshow: "Die App kann die Umgebung nicht analysieren, wenn Sie keine Berechtigung zum Zugriff auf die Kamera erteilen.",acceptstring: "")
-        case "ca":
-            showAlerttoclose(texttoshow: "L'aplicació no pot analitzar l'entorn si no doneu permís per accedir a la càmera.",acceptstring: "")
-        case "cs":
-            showAlerttoclose(texttoshow: "Pokud neudělíte přístup k fotoaparátu, aplikace nemůže analyzovat prostředí.",acceptstring: "")
-        case "zh":
-            showAlerttoclose(texttoshow: "如果您未授予访问相机的权限，则该应用无法分析环境。",acceptstring: "")
-        case "ko":
-            showAlerttoclose(texttoshow: "카메라에 대한 접근 권한을 부여하지 않으면 앱에서 환경을 분석 할 수 없습니다.",acceptstring: "")
-        case "hr":
-            showAlerttoclose(texttoshow: "Aplikacija ne može analizirati okruženje ako ne date dopuštenje za pristup kameri.",acceptstring: "")
-        case "da":
-            showAlerttoclose(texttoshow: "Appen kan ikke analysere miljøet, hvis du ikke giver tilladelse til at få adgang til kameraet.",acceptstring: "")
-        case "he":
-            showAlerttoclose(texttoshow: "האפליקציה לא יכולה לנתח את הסביבה אם אינך נותן הרשאה לגשת למצלמה.",acceptstring: "")
-        case "el":
-            showAlerttoclose(texttoshow: "Η εφαρμογή δεν μπορεί να αναλύσει το περιβάλλον εάν δεν επιτρέψετε την πρόσβαση στην κάμερα.",acceptstring: "")
-        case "hi":
-            showAlerttoclose(texttoshow: "यदि आप कैमरा एक्सेस करने की अनुमति नहीं देते हैं तो ऐप पर्यावरण का विश्लेषण नहीं कर सकता है।",acceptstring: "")
-        case "id":
-            showAlerttoclose(texttoshow: "Aplikasi tidak dapat menganalisis lingkungan jika Anda tidak memberikan izin untuk mengakses kamera.",acceptstring: "")
-        case "ms":
-            showAlerttoclose(texttoshow: "Aplikasi tidak dapat menganalisis persekitaran jika anda tidak memberikan kebenaran untuk mengakses kamera.",acceptstring: "")
-        case "no":
-            showAlerttoclose(texttoshow: "Appen kan ikke analysere miljøet hvis du ikke gir tilgang til kameraet.",acceptstring: "")
-        case "nl":
-            showAlerttoclose(texttoshow: "De app kan de omgeving niet analyseren als je geen toestemming geeft voor toegang tot de camera.",acceptstring: "")
-        case "pl":
-            showAlerttoclose(texttoshow: "Aplikacja nie może analizować środowiska, jeśli nie zezwolisz na dostęp do kamery.",acceptstring: "")
-        case "ro":
-            showAlerttoclose(texttoshow: "Aplicația nu poate analiza mediul dacă nu acordați permisiunea de a accesa camera.",acceptstring: "")
-        case "ru":
-            showAlerttoclose(texttoshow: "Приложение не сможет анализировать окружающую среду, если вы не дадите разрешение на доступ к камере.",acceptstring: "")
-        case "sk":
-            showAlerttoclose(texttoshow: "Ak neposkytnete povolenie na prístup k fotoaparátu, aplikácia nemôže analyzovať prostredie.",acceptstring: "")
-        case "th":
-            showAlerttoclose(texttoshow: "แอปไม่สามารถวิเคราะห์สภาพแวดล้อมได้หากคุณไม่อนุญาตให้เข้าถึงกล้อง",acceptstring: "")
-        case "tr","tk":
-            showAlerttoclose(texttoshow: "Kameraya erişim izni vermezseniz uygulama ortamı analiz edemez.",acceptstring: "")
-        case "uk":
-            showAlerttoclose(texttoshow: "Додаток не може аналізувати середовище, якщо ви не даєте дозволу на доступ до камери.",acceptstring: "")
-        case "hu":
-            showAlerttoclose(texttoshow: "Az alkalmazás nem tudja elemezni a környezetet, ha nem engedélyezi a kamera elérését.",acceptstring: "")
-        case "vi":
-            showAlerttoclose(texttoshow: "Ứng dụng không thể phân tích môi trường nếu bạn không cấp quyền truy cập vào máy ảnh.",acceptstring: "")
+            showAlerttoclose(texttoshow: "",acceptstring: "")
+   
         default:
-            showAlerttoclose(texttoshow: "The app can't analyze the environment if you do not give permission to access the camera.",acceptstring: "")
+            showAlerttoclose(texttoshow: "",acceptstring: "")
         }
         return
         
