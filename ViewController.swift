@@ -323,7 +323,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             for i in 0...diffmedium37.count - 1 {
                 if previousdiffmedium37.count < diffmedium37.count {previousdiffmedium37.append(diffmedium37[i]);continue}
                 if previousdiffmedium37.count > diffmedium37.count {previousdiffmedium37.removeFirst()}
-                difffromstandarddiffmedium += diffmedium37[i] - previousdiffmedium37[i]
+                difffromstandarddiffmedium += abs(diffmedium37[i] - previousdiffmedium37[i])
                 previousdiffmedium37[i] = diffmedium37[i]
             }
             if difffromstandarddiffmedium > 0.01 {return}
