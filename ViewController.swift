@@ -57,7 +57,9 @@ var lastaverage = 0
 var average = 0
 var filterimage : CIImage?
 var analyzing = false
-
+var lastpulsevalid = true
+var removenext = false
+var listofarythmiavalues = [Float]()
 class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     var listofpauses = ""
     var cuore = UIImageView()
@@ -146,9 +148,8 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     func alertnopermissiontocamera() {
         let code = getLanguageISO()
         switch code {
-        case "it":
+        case "":
             showAlerttoclose(texttoshow: "",acceptstring: "")
-   
         default:
             showAlerttoclose(texttoshow: "",acceptstring: "")
         }
@@ -294,7 +295,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                                                        }, completion:{_ in
                                                        })
                                                    })
-                
                 let effect = CIFilter(name: "CIDifferenceBlendMode")
                 effect?.setValue(previouslastimage, forKey: kCIInputImageKey)
                 effect?.setValue(i, forKey: kCIInputBackgroundImageKey)
@@ -321,23 +321,35 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             var difffromstandarddiffmedium = Float(0)
             
             for i in 0...diffmedium37.count - 1 {
+                //normalize
+                let max = diffmedium37.max() ?? 1
+                let min = diffmedium37.min() ?? 0
+                for i in 0...diffmedium37.count - 1{
+                    diffmedium37[i] = (diffmedium37[i] - min)/(max - min)
+                }
+                
                 if previousdiffmedium37.count < diffmedium37.count {previousdiffmedium37.append(diffmedium37[i]);continue}
                 if previousdiffmedium37.count > diffmedium37.count {previousdiffmedium37.removeFirst()}
                 difffromstandarddiffmedium += abs(diffmedium37[i] - previousdiffmedium37[i])
                 previousdiffmedium37[i] = diffmedium37[i]
             }
-            if difffromstandarddiffmedium > 0.01 {return}
+            print(difffromstandarddiffmedium)
+            if difffromstandarddiffmedium > 5 {diffmedium37.removeAll();removenext = true;return}
+            
             let now = NSDate().timeIntervalSinceReferenceDate
+            if removenext {lasttime = now;removenext = false;return}
             let interval = now - lasttime
-            intervals.append(interval)
             lasttime = now
+            
+            
+            intervals.append(interval)
             if intervals.count > 11 {analyze()}
                 AudioServicesPlaySystemSound(4095);
         }
     }
 
     func analyze() {
-        while intervals.count > 12 {intervals.removeFirst()}
+        while intervals.count > 11 {intervals.removeFirst()}
         let d = intervals.last ?? 0
         let f = String(d)
         listofpauses.append(String(f.prefix(3)) + "'' ,")   //  (String(intervals.last()).prefix(3)
@@ -350,7 +362,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         for i in 0...intervals.count - 1{deviationfrommean.append(abs(intervals[i] - mean)/((intervals[i] + mean)/2))}
         //calculatingaritmia
         for i in 0...deviationfrommean.count - 3{devofdeviationfrommean += deviationfrommean[i]*2 - (deviationfrommean[i + 1] - deviationfrommean[i + 2])}
-        stringtoshow = String(String(100*abs(devofdeviationfrommean/Double(deviationfrommean.count - 2))).prefix(7))
+        let arrvalue = 100*abs(devofdeviationfrommean/Double(deviationfrommean.count - 2))
+        listofarythmiavalues.append(Float(arrvalue))
+        stringtoshow = String(String(arrvalue).prefix(7))
     }
     
     override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?){
@@ -415,7 +429,7 @@ extension CIImage {
             mean32 += medium3[i]/17}
        
         //print(mean12)
-        diffmedium37.append(mean10 - mean12)
+        diffmedium37.append(valuetoreturn[0] - mean12)
         if diffmedium37.count > 20 {diffmedium37.removeFirst()}
         differences = [(differences[0] + abs(mean10 - mean12))/2,(differences[1] + abs(mean20 - mean22))/2,(differences[2] + abs(mean30 - mean32))/2]
         if differences.max() == differences[0] {preferredred += 1} else if differences.max() == differences[1] {preferredblue += 1} else if differences.max() == differences[2] {preferredgreen += 1}
@@ -462,5 +476,3 @@ extension AVCaptureDevice {
     }
     }}
 }
-
-
