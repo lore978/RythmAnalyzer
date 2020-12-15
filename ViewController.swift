@@ -70,6 +70,8 @@ var analyzingstring = "analisi in corso"
 var informationtext = ""
 var informationaccepted = false
 var allscrolled = false
+var intervalsconsecutive = [Bool]()
+var nextconsecutive = false
 class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate, UIScrollViewDelegate, UITextViewDelegate {
     var cuore = UIImageView()
     var sfondo = UIImageView()
@@ -89,7 +91,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     }
     @objc func timertapped(){
         scrollToEnd(text2)
-        print("timertapped")
             if !currentCamera!.isTorchActive{
                 do {try currentCamera?.lockForConfiguration();
             if currentCamera?.hasTorch ?? false  {if currentCamera?.isTorchModeSupported(.on) == true {currentCamera?.torchMode = .on}}
@@ -107,7 +108,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                     
                 } catch {return}
             } else {
-                if !analyzing {AudioServicesPlaySystemSound(1024);stringtoshow  = onthebackcamera;return}
+                if !analyzing {AudioServicesPlaySystemSound(1109);stringtoshow  = onthebackcamera;return}
                 if analyzing && col.max() == col[0] && col[0] > 50 && col[0] < 235 && Float(col[0])/(Float(col[1]) + 1) >= 4 && Float(col[0])/(Float(col[2]) + 1) >= 4 {return}
                 do {try currentCamera?.lockForConfiguration();if currentCamera?.isWhiteBalanceModeSupported(.continuousAutoWhiteBalance) == true { currentCamera?.whiteBalanceMode = .continuousAutoWhiteBalance} else
                 if currentCamera?.isWhiteBalanceModeSupported(.autoWhiteBalance) == true { currentCamera?.whiteBalanceMode = .autoWhiteBalance}
@@ -115,9 +116,9 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 if currentCamera?.isExposureModeSupported(.autoExpose) == true {  currentCamera?.exposureMode = .autoExpose}
                     currentCamera?.unlockForConfiguration()} catch {return}
                 analyzing = false
-                if Float(col[0])/(Float(col[1]) + 1) < 4 || Float(col[0])/(Float(col[2]) + 1) < 4 {stringtoshow  = onthebackcamera;AudioServicesPlaySystemSound(1024);return}
-                if col[0] <= 50  {stringtoshow = lesspressure;AudioServicesPlaySystemSound(1024);return}
-                if col[0] >= 235  {stringtoshow =  morepressure;AudioServicesPlaySystemSound(1024);return}
+                if Float(col[0])/(Float(col[1]) + 1) < 4 || Float(col[0])/(Float(col[2]) + 1) < 4 {stringtoshow  = onthebackcamera;AudioServicesPlaySystemSound(1109);return}
+                if col[0] <= 50  {stringtoshow = lesspressure;AudioServicesPlaySystemSound(1109);return}
+                if col[0] >= 235  {stringtoshow =  morepressure;AudioServicesPlaySystemSound(1109);return}
             }
         }
 
@@ -126,12 +127,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         changestrings()
         cuore.image = UIImage(named: "cuore.png")
         cuore.frame = CGRect(x: self.view.bounds.midX - self.view.bounds.width/5, y: self.view.bounds.midY - self.view.bounds.width/5, width: self.view.bounds.width*0.4, height: self.view.bounds.width*0.4)
-        print(self.view.bounds.width*0.4)
         sfondo.frame = self.view.frame//CGRect(x: self.view.bounds.midX - self.view.bounds.width*0.4, y: self.view.bounds.midY - self.view.bounds.width*0.4, width: self.view.bounds.width*0.8, height: self.view.bounds.width*0.8)
         text.frame = CGRect(x: self.view.bounds.minX, y: self.view.bounds.maxY * 0.8, width: self.view.bounds.width, height: self.view.bounds.height*0.2)
         text2.frame = CGRect(x: self.view.bounds.minX, y: self.view.bounds.maxY * 0.2, width: self.view.bounds.width, height: self.view.bounds.height*0.5)
         if !informationreaded() {self.createinformation()} else {startanalyzing()}
-        
     }
     
     func scrollToEnd(_ someTextView:UITextView) {
@@ -240,70 +239,11 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     func alertnopermissiontocamera() {
         let code = getLanguageISO()
         switch code {
-       /* case "ar":
-            showAlerttoclose(texttoshow: "سيقومسيقوم التطبيق بالتسجيل على بيانات جهازك المستخرجة من الصور للمقارنة والعثور على أكثرها تشابهًا. لن يتم مشاركة البيانات بأي شكل من الأشكال. قبوللا يمكن للتطبيق تحليل البيئة إذا لم تمنح الإذن للوصول إلى الكاميرا.",acceptstring: "")
-        case "fi":
-            showAlerttoclose(texttoshow: "Sovellus ei voi analysoida ympäristöä, jos et anna lupaa käyttää kameraa.",acceptstring: "")
-        case "fr":
-            showAlerttoclose(texttoshow: "L'application ne peut pas analyser l'environnement si vous ne donnez pas la permission d'accéder à la caméra.",acceptstring: "")
-        case "ja":
-            showAlerttoclose(texttoshow: "カメラへのアクセスを許可しないと、アプリは環境を分析できません。",acceptstring: "")*/
         case "it":
-            showAlerttoclose(texttoshow: "l'app non può analizzare il ritmo se non si autorizza l'accesso alla fotocamera.",acceptstring: "")/*
-        case "pt":
-            showAlerttoclose(texttoshow: "O aplicativo não pode analisar o ambiente se você não der permissão para acessar a câmera.",acceptstring: "")
-        case "es":
-            showAlerttoclose(texttoshow: "La aplicación no puede analizar el entorno si no da permiso para acceder a la cámara.",acceptstring: "")
-        case "sv":
-            showAlerttoclose(texttoshow: "Appen kan inte analysera miljön om du inte ger behörighet att komma åt kameran.",acceptstring: "")
-        case "de":
-            showAlerttoclose(texttoshow: "Die App kann die Umgebung nicht analysieren, wenn Sie keine Berechtigung zum Zugriff auf die Kamera erteilen.",acceptstring: "")
-        case "ca":
-            showAlerttoclose(texttoshow: "L'aplicació no pot analitzar l'entorn si no doneu permís per accedir a la càmera.",acceptstring: "")
-        case "cs":
-            showAlerttoclose(texttoshow: "Pokud neudělíte přístup k fotoaparátu, aplikace nemůže analyzovat prostředí.",acceptstring: "")
-        case "zh":
-            showAlerttoclose(texttoshow: "如果您未授予访问相机的权限，则该应用无法分析环境。",acceptstring: "")
-        case "ko":
-            showAlerttoclose(texttoshow: "카메라에 대한 접근 권한을 부여하지 않으면 앱에서 환경을 분석 할 수 없습니다.",acceptstring: "")
-        case "hr":
-            showAlerttoclose(texttoshow: "Aplikacija ne može analizirati okruženje ako ne date dopuštenje za pristup kameri.",acceptstring: "")
-        case "da":
-            showAlerttoclose(texttoshow: "Appen kan ikke analysere miljøet, hvis du ikke giver tilladelse til at få adgang til kameraet.",acceptstring: "")
-        case "he":
-            showAlerttoclose(texttoshow: "האפליקציה לא יכולה לנתח את הסביבה אם אינך נותן הרשאה לגשת למצלמה.",acceptstring: "")
-        case "el":
-            showAlerttoclose(texttoshow: "Η εφαρμογή δεν μπορεί να αναλύσει το περιβάλλον εάν δεν επιτρέψετε την πρόσβαση στην κάμερα.",acceptstring: "")
-        case "hi":
-            showAlerttoclose(texttoshow: "यदि आप कैमरा एक्सेस करने की अनुमति नहीं देते हैं तो ऐप पर्यावरण का विश्लेषण नहीं कर सकता है।",acceptstring: "")
-        case "id":
-            showAlerttoclose(texttoshow: "Aplikasi tidak dapat menganalisis lingkungan jika Anda tidak memberikan izin untuk mengakses kamera.",acceptstring: "")
-        case "ms":
-            showAlerttoclose(texttoshow: "Aplikasi tidak dapat menganalisis persekitaran jika anda tidak memberikan kebenaran untuk mengakses kamera.",acceptstring: "")
-        case "no":
-            showAlerttoclose(texttoshow: "Appen kan ikke analysere miljøet hvis du ikke gir tilgang til kameraet.",acceptstring: "")
-        case "nl":
-            showAlerttoclose(texttoshow: "De app kan de omgeving niet analyseren als je geen toestemming geeft voor toegang tot de camera.",acceptstring: "")
-        case "pl":
-            showAlerttoclose(texttoshow: "Aplikacja nie może analizować środowiska, jeśli nie zezwolisz na dostęp do kamery.",acceptstring: "")
-        case "ro":
-            showAlerttoclose(texttoshow: "Aplicația nu poate analiza mediul dacă nu acordați permisiunea de a accesa camera.",acceptstring: "")
-        case "ru":
-            showAlerttoclose(texttoshow: "Приложение не сможет анализировать окружающую среду, если вы не дадите разрешение на доступ к камере.",acceptstring: "")
-        case "sk":
-            showAlerttoclose(texttoshow: "Ak neposkytnete povolenie na prístup k fotoaparátu, aplikácia nemôže analyzovať prostredie.",acceptstring: "")
-        case "th":
-            showAlerttoclose(texttoshow: "แอปไม่สามารถวิเคราะห์สภาพแวดล้อมได้หากคุณไม่อนุญาตให้เข้าถึงกล้อง",acceptstring: "")
-        case "tr","tk":
-            showAlerttoclose(texttoshow: "Kameraya erişim izni vermezseniz uygulama ortamı analiz edemez.",acceptstring: "")
-        case "uk":
-            showAlerttoclose(texttoshow: "Додаток не може аналізувати середовище, якщо ви не даєте дозволу на доступ до камери.",acceptstring: "")
-        case "hu":
-            showAlerttoclose(texttoshow: "Az alkalmazás nem tudja elemezni a környezetet, ha nem engedélyezi a kamera elérését.",acceptstring: "")
-        case "vi":
-            showAlerttoclose(texttoshow: "Ứng dụng không thể phân tích môi trường nếu bạn không cấp quyền truy cập vào máy ảnh.",acceptstring: "")*/
+            showAlerttoclose(texttoshow: "l'app non può analizzare il ritmo se non si autorizza l'accesso alla fotocamera.",acceptstring: "")
+
         default:
-            showAlerttoclose(texttoshow: "the app can't analyze the rythm if you do not give permission to access the camera.",acceptstring: "")
+            showAlerttoclose(texttoshow: "the app can't analyze the rhythm if you do not give permission to access the camera.",acceptstring: "")
         }
         return
         
@@ -312,139 +252,19 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
     func changestrings() {
         let code = getLanguageISO()
         switch code {
-     /*   case "ar":
-           onthebackcamera = ""
-           lesspressure = ""
-           morepressure = ""
-        //arabo
-        case "fi":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//finlandese
-        case "fr":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//framcese
-        case "ja":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//giapponese*/
         case "it":
             onthebackcamera = "poggia il tuo dito sulla fotocamera posteriore"
             lesspressure = "permetti alla luce del flash di illuminare il tuo dito"
             morepressure = "copri maggiormente la fotocamera"//italiano
             analyzingstring = "analisi in corso"
-            informationtext = "Leggi fino in fondo per avviare RythmAnalyzer.\n\nIl battito cardiaco è normalmente ritmico cioè con pause tra i battiti di quasi uguale durata o fisiologicamente aritmico nelle persone giovani (pause tra i battiti che aumentano durante l’espirazione e si riducono durante l’inspirazione respiratoria).\n\nA volte ci possono essere dei battiti in più o in meno su un ritmo per il resto normale e sono causati da extrasistoli che possono indicare una malattia o essere benigne e quindi senza una malattia sottostante.\n\nEsiste anche una malattia che necessita di terapia medica continua chiamata fibrillazione atriale, nella quale le pause tra i battiti sono tutte diverse.\n\nRythmAnalyzer ha lo scopo di rilevare le pause tra i battiti e assegnare un valore alla loro aritmicità.\n\nPer fare questo ha la necessità di eliminare il più possibile dall’analisi gli artefatti (segnali interpretati come battiti ma che non lo sono) e quindi ha bisogno di alcuni secondi in più per l’analisi rispetto ad altre app che rilevano la frequenza cardiaca, oltre che un posizionamento del dito stabile e ottimale.\n\nLa posizione ottimale è questa: adagia il tuo dispositivo con la fotocamera posteriore rivolta verso l’alto e poggia il dito, con una leggera pressione, sulla fotocamera e sul flash, se hai un dispositivo con fotocamera multipla poggia più dita fino a coprire tutte le fotocamere.\n\nSe non senti segnali acustici significa che hai posizionato bene il dito e dopo alcuni secondi il tuo dispositivo inizierà a vibrare quanto percepisce un battito o emetterà un segnale aptico in caso di battito dubbio. Sono necessarie almeno venti vibrazioni (vengono calcolate solo quelle in cui ci sono almeno quattro segnali validi consecutivi), puoi leggere sul display gli intervalli in secondi e gli asterischi ad indicare battiti inseriti in intervalli aritmici e fai shake per copiare la lista degli intervalli.\n\nIn presenza di asterischi ti invitiamo a consultare un medico.\n\nRythmAnalyzer ha lo scopo di rilevare aritmie silenti, cioè non associate a sintomi o malattie diagnosticate o sospette, quindi in presenza di qualsiasi dubbio di malattia non affidarti a RythmAnalyzer e consulta un medico.\n\nFai doppio tap qui sotto per avviare l'applicazione."
-      /*  case "pt":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//portoghese
-        case "es":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//spagnolo
-        case "sv":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//svedese
-        case "de":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//tedesco
-        case "ca":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//catalano
-        case "cs":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//ceco
-        case "zh":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//cinese
-        case "ko":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//coreano
-        case "hr":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//croato
-        case "da":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//danese
-        case "he":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//ebraico
-        case "el":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//greco
-        case "hi":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//hindi
-        case "id":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//indonesiano
-        case "ms":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//malese
-        case "no":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//norvegese
-        case "nl":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//olandese
-        case "pl":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//polacco
-        case "ro":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//rumeno
-        case "ru":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//russo
-        case "sk":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//slovacco
-        case "th":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//thailandese
-        case "tr","tk":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//turco
-        case "uk":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//ucraino
-        case "hu":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//ungherese
-        case "vi":
-            onthebackcamera = ""
-            lesspressure = ""
-            morepressure = ""//vietnamita*/
+            informationtext = "Leggi fino in fondo per avviare RhythmAnalyzer.\n\nIl battito cardiaco è normalmente ritmico cioè con pause tra i battiti di quasi uguale durata o fisiologicamente aritmico nelle persone giovani (pause tra i battiti che aumentano durante l’espirazione e si riducono durante l’inspirazione respiratoria).\n\nA volte ci possono essere dei battiti in più o in meno su un ritmo per il resto normale e sono causati da extrasistoli che possono indicare una malattia o essere benigne e quindi senza una malattia sottostante.\n\nEsiste anche una malattia che necessita di terapia medica continua chiamata fibrillazione atriale, nella quale le pause tra i battiti sono tutte diverse.\n\nRhythmAnalyzer ha lo scopo di rilevare le pause tra i battiti e assegnare un valore alla loro aritmicità.\n\nPer fare questo ha la necessità di eliminare il più possibile dall’analisi gli artefatti (segnali interpretati come battiti ma che non lo sono) e quindi ha bisogno di alcuni secondi in più per l’analisi rispetto ad altre app che rilevano la frequenza cardiaca, oltre che un posizionamento del dito stabile e ottimale.\n\nLa posizione ottimale è questa: adagia il tuo dispositivo con la fotocamera posteriore rivolta verso l’alto e poggia il dito, con una leggera pressione, sulla fotocamera e sul flash, se hai un dispositivo con fotocamera multipla poggia più dita fino a coprire tutte le fotocamere.\n\nSe non senti segnali acustici significa che hai posizionato bene il dito e dopo alcuni secondi il tuo dispositivo inizierà a vibrare quanto percepisce un battito o emetterà un segnale aptico in caso di battito dubbio. Sono necessarie almeno venti vibrazioni (vengono calcolate solo quelle in cui ci sono almeno quattro segnali validi consecutivi), puoi leggere sul display gli intervalli in secondi e gli asterischi ad indicare battiti inseriti in intervalli aritmici e fai shake per copiare la lista degli intervalli.\n\nIn presenza di asterischi ti invitiamo a consultare un medico.\n\nRhythmAnalyzer ha lo scopo di rilevare aritmie silenti, cioè non associate a sintomi o malattie diagnosticate o sospette, quindi in presenza di qualsiasi dubbio di malattia non affidarti a RhythmAnalyzer e consulta un medico.\n\nFai doppio tap qui sotto per avviare l'applicazione."
+      
         default:
             onthebackcamera = "place your finger on the rear camera"
             lesspressure = "allow the flash light to illuminate your finger"
             morepressure = "cover more the camera with your finger"
             analyzingstring = "analyzing"//inglese
-            informationtext = "Read all text below to use RythmAnalyzer\n\nThe heartbeat is normally rhythmic that means duration pauses between beats are almost equal or physiologically arrhythmic in young people (pauses between beats increase during exhalation and decrease during inhalation).\n\nSometimes there may be more or less beats on an otherwise normal rhythm and are caused by extrasystoles that may indicate disease or be benign and therefore without an underlying disease.\n\nIt also exists a disease that requires ongoing medical therapy called atrial fibrillation, in which the pauses between beats are all different.\n\nRythmAnalyzer has the purpose of detecting the pauses between beats and assigning a value to their arrhythmicity.\n\nTo do this it needs to eliminate as much as possible from the analyzes artifacts (signals interpreted as beats but which are not) and therefore needs a few more seconds for analysis than other apps that detect heart rate, as well as a optimal and stable finger positioning.\n\nThe optimal position is this: lay your device with the rear camera facing upwards and place your finger, with a light pressure, on the camera and flash; if you have a device with multiple camera use several fingers until all cameras are covered.\n\nIf you do not hear beeps it means that you have positioned your finger correctly and after a few seconds your device will start vibrating when it perceives a beat or emits a haptic signal in case of a beat doubt. A minimum of at least twenty vibrations are needed to describe your rythm (only those in which there are at least four consecutive valid signals are calculated), you can find on the display the intervals in seconds and asterisks to indicate beats entered in arrhythmic intervals and shake your device to copy the list of intervals.\n\nIn the presence of asterisks please consult a doctor.\n\nRythmAnalyzer is intended to detect silent arrhythmias, that is, not associated with symptoms or diagnosed or suspected diseases, so in the presence of any doubt of disease do not rely on RythmAnalyzer and consult a doctor.\n\nDouble tap below to start the application."
+            informationtext = "Read all text below to use RhythmAnalyzer\n\nThe heartbeat is normally rhythmic that means duration pauses between beats are almost equal or physiologically arrhythmic in young people (pauses between beats increase during exhalation and decrease during inhalation).\n\nSometimes there may be more or less beats on an otherwise normal rhythm and are caused by extrasystoles that may indicate disease or be benign and therefore without an underlying disease.\n\nIt also exists a disease that requires ongoing medical therapy called atrial fibrillation, in which the pauses between beats are all different.\n\nRhythmAnalyzer has the purpose of detecting the pauses between beats and assigning a value to their arrhythmicity.\n\nTo do this it needs to eliminate as much as possible from the analyzes artifacts (signals interpreted as beats but which are not) and therefore needs a few more seconds for analysis than other apps that detect heart rate, as well as a optimal and stable finger positioning.\n\nThe optimal position is this: lay your device with the rear camera facing upwards and place your finger, with a light pressure, on the camera and flash; if you have a device with multiple camera use several fingers until all cameras are covered.\n\nIf you do not hear beeps it means that you have positioned your finger correctly and after a few seconds your device will start vibrating when it perceives a beat or emits a haptic signal in case of a beat doubt. A minimum of at least twenty vibrations are needed to describe your rhythm (only those in which there are at least four consecutive valid signals are calculated), you can find on the display the intervals in seconds and asterisks to indicate beats entered in arrhythmic intervals and shake your device to copy the list of intervals.\n\nIn the presence of asterisks please consult a doctor.\n\nRhythmAnalyzer is intended to detect silent arrhythmias, that is, not associated with symptoms or diagnosed or suspected diseases, so in the presence of any doubt of disease do not rely on RhythmAnalyzer and consult a doctor.\n\nDouble tap below to start the application."
         }
         return
         
@@ -574,7 +394,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 let effect3 = CIFilter(name: "CIMultiplyBlendMode")
                 effect3?.setValue(filterimage, forKey: kCIInputImageKey)
                 effect3?.setValue(i, forKey: kCIInputBackgroundImageKey)
-                if (effect3?.outputImage ?? i).averageColor == true {
+                DispatchQueue.main.async{ if (effect3?.outputImage ?? i).averageColor == true {
                                                     UIView.animate(withDuration: 0.3,
                                                                 delay: 0,
                                                                 options: [.curveEaseOut],
@@ -597,10 +417,11 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 effect2?.setValue(effect?.outputImage, forKey: kCIInputImageKey)
                 effect2?.setValue(i, forKey: kCIInputBackgroundImageKey)
                 }; //if let i = (effect2?.outputImage) {filterimage = i;}
+            }
                 sfondo.image = UIImage(ciImage: effect3?.outputImage ?? i )
             }}}
     
-    func alert(type: Int, color: Int) {
+    func alert(type: Int, color: Int) {DispatchQueue.main.async{
         switch type {
         case 0:
             switch color {
@@ -628,22 +449,26 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 difffromstandarddiffmedium += abs(diffmedium37[i] - previousdiffmedium37[i])
                 previousdiffmedium37[i] = diffmedium37[i]
             }
-            print(difffromstandarddiffmedium)
+            //print(diffmedium37)
             if difffromstandarddiffmedium > 3 {diffmedium37.removeAll();removenext = true;return}
             let now = NSDate().timeIntervalSinceReferenceDate
+            var consecutive = false
             if removenext {removenext = false;removenext2 = true;return}
             if removenext2 {removenext2 = false;removenext3 = true;return}
-            if removenext3 {lasttime = now;removenext3 = false;return}
+            if removenext3 {lasttime = now;removenext3 = false;return} else {consecutive = true}
             let interval = now - lasttime
             lasttime = now
+            intervalsconsecutive.append(consecutive)
             intervals.append(interval)
             
-            if intervals.count > 11 {analyze()}
+            if intervals.count > 11 {self.analyze()}
+            }
         }
     }
 
     func analyze() {
         while intervals.count > 11 {intervals.removeFirst()}
+        while intervalsconsecutive.count > 11 {intervalsconsecutive.removeFirst()}
         let d = intervals.last ?? 0
         let f = String(d)
         stringtoshow2.append(String(f.prefix(4)))
@@ -652,15 +477,20 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         var devofdeviationfrommean = Double(0)
         for i in 0...intervals.count - 1{mean += intervals[i]}
         mean = mean/Double(intervals.count)
-        for i in 0...intervals.count - 1{deviationfrommean.append(abs(intervals[i] - mean)/((intervals[i] + mean)/2))}
+        for i in 0...intervals.count - 1{deviationfrommean.append((intervals[i] - mean)/((intervals[i] + mean)/2))}
+        //calculatingtrends
+        var lasttrend = Double(0)
+        var differencesintrend = Double(0)
+        for i in 0...deviationfrommean.count - 2  {if intervalsconsecutive[i] && intervalsconsecutive[i+1]{let oldtrend = lasttrend;lasttrend += deviationfrommean[i] - deviationfrommean[i+1];differencesintrend += abs(lasttrend - oldtrend)} }
+        print("differencesintrend",differencesintrend)
         //calculatingaritmia
-        for i in 0...deviationfrommean.count - 3{devofdeviationfrommean += deviationfrommean[i]*2 - (deviationfrommean[i + 1] - deviationfrommean[i + 2])}
-        let arrvalue = 100*abs(devofdeviationfrommean/Double(deviationfrommean.count - 2))
+        for i in 0...deviationfrommean.count - 3{devofdeviationfrommean += abs(deviationfrommean[i]*2) - (abs(deviationfrommean[i + 1]) - abs(deviationfrommean[i + 2]))}
+        let arrvalue = max(0,100*abs(devofdeviationfrommean/Double(deviationfrommean.count - 2)) - abs(differencesintrend)*30)
         listofarythmiavalues.append(Float(arrvalue))
         switch arrvalue {
-        case 0...16:
+        case 0...15:
             stringtoshow2.append(",")
-        case 16...25:
+        case 15...25:
             stringtoshow2.append("*,")
         case 25...50:
             stringtoshow2.append("**,")
