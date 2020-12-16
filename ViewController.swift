@@ -53,6 +53,9 @@ var lasttime = Double(0)
 var stepred = 0
 var stepgreen = 0
 var stepblue = 0
+var stepdred = 0
+var stepdgreen = 0
+var stedpblue = 0
 var previousindexcolor = 0
 var lastaverage = 0
 var average = 0
@@ -109,15 +112,15 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 } catch {return}
             } else {
                 if !analyzing {AudioServicesPlaySystemSound(1109);stringtoshow  = onthebackcamera;return}
-                if analyzing && col.max() == col[0] && col[0] > 50 && col[0] < 235 && Float(col[0])/(Float(col[1]) + 1) >= 4 && Float(col[0])/(Float(col[2]) + 1) >= 4 {return}
+                if analyzing && col.max() == col[0] && col[0] > 30 && col[0] < 235 && Float(col[0])/(Float(col[1]) + 1) >= 3 && Float(col[0])/(Float(col[2]) + 1) >= 3 {return}
                 do {try currentCamera?.lockForConfiguration();if currentCamera?.isWhiteBalanceModeSupported(.continuousAutoWhiteBalance) == true { currentCamera?.whiteBalanceMode = .continuousAutoWhiteBalance} else
                 if currentCamera?.isWhiteBalanceModeSupported(.autoWhiteBalance) == true { currentCamera?.whiteBalanceMode = .autoWhiteBalance}
                 if currentCamera?.isExposureModeSupported(.continuousAutoExposure) == true {  currentCamera?.exposureMode = .continuousAutoExposure} else
                 if currentCamera?.isExposureModeSupported(.autoExpose) == true {  currentCamera?.exposureMode = .autoExpose}
                     currentCamera?.unlockForConfiguration()} catch {return}
                 analyzing = false
-                if Float(col[0])/(Float(col[1]) + 1) < 4 || Float(col[0])/(Float(col[2]) + 1) < 4 {stringtoshow  = onthebackcamera;AudioServicesPlaySystemSound(1109);return}
-                if col[0] <= 50  {stringtoshow = lesspressure;AudioServicesPlaySystemSound(1109);return}
+                if Float(col[0])/(Float(col[1]) + 1) < 3 || Float(col[0])/(Float(col[2]) + 1) < 3 {stringtoshow  = onthebackcamera;AudioServicesPlaySystemSound(1109);return}
+                if col[0] <= 30  {stringtoshow = lesspressure;AudioServicesPlaySystemSound(1109);return}
                 if col[0] >= 235  {stringtoshow =  morepressure;AudioServicesPlaySystemSound(1109);return}
             }
         }
@@ -241,7 +244,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         switch code {
         case "it":
             showAlerttoclose(texttoshow: "l'app non può analizzare il ritmo se non si autorizza l'accesso alla fotocamera.",acceptstring: "")
-
         default:
             showAlerttoclose(texttoshow: "the app can't analyze the rhythm if you do not give permission to access the camera.",acceptstring: "")
         }
@@ -258,7 +260,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
             morepressure = "copri maggiormente la fotocamera"//italiano
             analyzingstring = "analisi in corso"
             informationtext = "Leggi fino in fondo per avviare RhythmAnalyzer.\n\nIl battito cardiaco è normalmente ritmico cioè con pause tra i battiti di quasi uguale durata o fisiologicamente aritmico nelle persone giovani (pause tra i battiti che aumentano durante l’espirazione e si riducono durante l’inspirazione respiratoria).\n\nA volte ci possono essere dei battiti in più o in meno su un ritmo per il resto normale e sono causati da extrasistoli che possono indicare una malattia o essere benigne e quindi senza una malattia sottostante.\n\nEsiste anche una malattia che necessita di terapia medica continua chiamata fibrillazione atriale, nella quale le pause tra i battiti sono tutte diverse.\n\nRhythmAnalyzer ha lo scopo di rilevare le pause tra i battiti e assegnare un valore alla loro aritmicità.\n\nPer fare questo ha la necessità di eliminare il più possibile dall’analisi gli artefatti (segnali interpretati come battiti ma che non lo sono) e quindi ha bisogno di alcuni secondi in più per l’analisi rispetto ad altre app che rilevano la frequenza cardiaca, oltre che un posizionamento del dito stabile e ottimale.\n\nLa posizione ottimale è questa: adagia il tuo dispositivo con la fotocamera posteriore rivolta verso l’alto e poggia il dito, con una leggera pressione, sulla fotocamera e sul flash, se hai un dispositivo con fotocamera multipla poggia più dita fino a coprire tutte le fotocamere.\n\nSe non senti segnali acustici significa che hai posizionato bene il dito e dopo alcuni secondi il tuo dispositivo inizierà a vibrare quanto percepisce un battito o emetterà un segnale aptico in caso di battito dubbio. Sono necessarie almeno venti vibrazioni (vengono calcolate solo quelle in cui ci sono almeno quattro segnali validi consecutivi), puoi leggere sul display gli intervalli in secondi e gli asterischi ad indicare battiti inseriti in intervalli aritmici e fai shake per copiare la lista degli intervalli.\n\nIn presenza di asterischi ti invitiamo a consultare un medico.\n\nRhythmAnalyzer ha lo scopo di rilevare aritmie silenti, cioè non associate a sintomi o malattie diagnosticate o sospette, quindi in presenza di qualsiasi dubbio di malattia non affidarti a RhythmAnalyzer e consulta un medico.\n\nFai doppio tap qui sotto per avviare l'applicazione."
-      
         default:
             onthebackcamera = "place your finger on the rear camera"
             lesspressure = "allow the flash light to illuminate your finger"
@@ -450,7 +451,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 previousdiffmedium37[i] = diffmedium37[i]
             }
             //print(diffmedium37)
-            if difffromstandarddiffmedium > 3 {diffmedium37.removeAll();removenext = true;return}
+            if difffromstandarddiffmedium > 3.5 {diffmedium37.removeAll();removenext = true;return}
             let now = NSDate().timeIntervalSinceReferenceDate
             var consecutive = false
             if removenext {removenext = false;removenext2 = true;return}
@@ -485,7 +486,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         print("differencesintrend",differencesintrend)
         //calculatingaritmia
         for i in 0...deviationfrommean.count - 3{devofdeviationfrommean += abs(deviationfrommean[i]*2) - (abs(deviationfrommean[i + 1]) - abs(deviationfrommean[i + 2]))}
-        let arrvalue = max(0,100*abs(devofdeviationfrommean/Double(deviationfrommean.count - 2)) - abs(differencesintrend)*30)
+        let arrvalue = max(0,100*abs(devofdeviationfrommean/Double(deviationfrommean.count - 2)) - abs(differencesintrend)*20)
         listofarythmiavalues.append(Float(arrvalue))
         switch arrvalue {
         case 0...15:
@@ -573,7 +574,10 @@ extension CIImage {
                 if stepred == 1 && mean10 > mean11 {stepred = 2}
                 if stepred == 2 && mean11 > mean12 {stepred = 3}
                 if stepred == 3 && signalfree && !redup{redup = true;ViewController().alert(type: 1, color: 0);signalfree = false;DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {signalfree = true};return true}
-                if (mean10 < mean11 || valuetoreturn[0] < mean11) && mean11 < mean12 && signalfree && redup{stepred = 0;previouslastimage = lastimage;redup = false}
+                if valuetoreturn[0] < mean10 && stepdred == 0 {stepdred = 1}
+                if stepdred == 1 && mean10 < mean11 {stepdred = 2}
+                if stepdred == 2 && mean11 < mean12 {stepdred = 3}
+                if stepdred == 3 && signalfree && redup{stepdred = 0;previouslastimage = lastimage;redup = false}
             } else {ViewController().alert(type: 0, color: 0)}
         case preferredblue:
             if preferredblue > 200 {
