@@ -451,7 +451,7 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
                 previousdiffmedium37[i] = diffmedium37[i]
             }
             //print(diffmedium37)
-            if difffromstandarddiffmedium > 3.5 {diffmedium37.removeAll();removenext = true;return}
+            if difffromstandarddiffmedium > 3 {diffmedium37.removeAll();removenext = true;return}
             let now = NSDate().timeIntervalSinceReferenceDate
             var consecutive = false
             if removenext {removenext = false;removenext2 = true;return}
