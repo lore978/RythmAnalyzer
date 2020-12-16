@@ -479,7 +479,6 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         for i in 0...intervals.count - 1{mean += intervals[i]}
         mean = mean/Double(intervals.count)
         for i in 0...intervals.count - 1{deviationfrommean.append((intervals[i] - mean)/((intervals[i] + mean)/2))}
-        //calculatingtrends
         
         //calculatingaritmia
         for i in 0...deviationfrommean.count - 3{devofdeviationfrommean += abs(deviationfrommean[i]*2) - (abs(deviationfrommean[i + 1]) - abs(deviationfrommean[i + 2]))}
