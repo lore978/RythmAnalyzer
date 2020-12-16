@@ -480,13 +480,10 @@ class ViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDele
         mean = mean/Double(intervals.count)
         for i in 0...intervals.count - 1{deviationfrommean.append((intervals[i] - mean)/((intervals[i] + mean)/2))}
         //calculatingtrends
-        var lasttrend = Double(0)
-        var differencesintrend = Double(0)
-        for i in 0...deviationfrommean.count - 2  {if intervalsconsecutive[i] && intervalsconsecutive[i+1]{let oldtrend = lasttrend;lasttrend += deviationfrommean[i] - deviationfrommean[i+1];differencesintrend += abs(lasttrend - oldtrend)} }
-        print("differencesintrend",differencesintrend)
+        
         //calculatingaritmia
         for i in 0...deviationfrommean.count - 3{devofdeviationfrommean += abs(deviationfrommean[i]*2) - (abs(deviationfrommean[i + 1]) - abs(deviationfrommean[i + 2]))}
-        let arrvalue = max(0,100*abs(devofdeviationfrommean/Double(deviationfrommean.count - 2)) - abs(differencesintrend)*20)
+        let arrvalue = max(0,100*abs(devofdeviationfrommean/Double(deviationfrommean.count - 2)))
         listofarythmiavalues.append(Float(arrvalue))
         switch arrvalue {
         case 0...15:
